@@ -33,11 +33,11 @@ enum Direction {
 export class AppComponent implements DoCheck {
   /** Entry fee from form. */
   @Input()
-  entryFees = 100;
+  entryFees = 160;
 
   /** Minimum payout from form. */
   @Input()
-  minimum = 10;
+  minimum = 20;
 
   /**
    * Payouts to disable.
@@ -60,7 +60,15 @@ export class AppComponent implements DoCheck {
     this.calculatePayouts();
   }
 
+  private validNumber(x): boolean {
+    return Number(x) > 0;
+  }
+
   private calculatePayouts(): void {
+    if (!this.validNumber(this.entryFees) || !this.validNumber(this.minimum)) {
+      this.actualPayouts = [];
+      return;
+    }
     const round = this.getRoundFactor();
     let ok = false;
     for (let i = 0; i < this.PAYOUTS.length; ++i) {

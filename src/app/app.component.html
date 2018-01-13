@@ -12,7 +12,7 @@
         <label for="entryFees">Entry Fees</label>
       </td>
       <td>
-        <input [(ngModel)]="entryFees" name="entryFees" id="entryFees" type="number" min="0"/>
+        <input [(ngModel)]="entryFees" name="entryFees" type="number" min="0"/>
       </td>
     </tr>
     <tr>
@@ -20,7 +20,7 @@
         <label for="minimum">Minimum Payout</label>
       </td>
       <td>
-        <input [(ngModel)]="minimum" name="minimum" id="minimum" type="number" min="0"/>
+        <input [(ngModel)]="minimum" name="minimum" type="number" min="1"/>
       </td>
     </tr>
     </tbody>
@@ -35,7 +35,7 @@
     <td>Amount</td>
   </thead>
   <tbody>
-    <tr *ngFor="let payout of actualPayouts">
+    <tr id="payouts" *ngFor="let payout of actualPayouts">
       <td>{{payout.place}}</td>
       <td>%{{payout.percentage * 100}}</td>
       <td>${{payout.amount}}</td>
