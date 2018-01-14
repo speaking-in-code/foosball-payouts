@@ -1,7 +1,8 @@
 import { TestBed, async } from '@angular/core/testing';
-import { AppComponent } from './app.component';
-import {FormsModule} from '@angular/forms';
-import {BrowserModule} from '@angular/platform-browser';
+import { AppComponent, PayoutType, TableList } from './app.component';
+import { FormsModule } from '@angular/forms';
+import { BrowserModule } from '@angular/platform-browser';
+
 describe('AppComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
@@ -14,19 +15,64 @@ describe('AppComponent', () => {
       ],
     }).compileComponents();
   }));
+
   it('should create the app', async(() => {
     const fixture = TestBed.createComponent(AppComponent);
     const app = fixture.debugElement.componentInstance;
     expect(app).toBeTruthy();
   }));
 
-  it('should have all payouts sum to 1.0', async(() => {
+  it('should have valid payout tables', async() => {
     const fixture = TestBed.createComponent(AppComponent);
-    const payouts = fixture.componentInstance.PAYOUTS;
-    for (let i = 0; i < payouts.length; ++i) {
-      expectSumToOne(payouts[i]);
+    fixture.componentInstance.TABLES.forEach((value: TableList, key: PayoutType) => {
+      expectValidPayout(key, value);
+    });
+
+    // Ranked tables should be strictly descending.
+    fixture.componentInstance.TABLES.get(PayoutType.Ranked).table.forEach(
+      (payouts: number[]) => {
+      expectStrictDescendingOrder(payouts);
+    });
+
+    // Tables with ties should be monotonically descending.
+    fixture.componentInstance.TABLES.get(PayoutType.DoubleElim).table.forEach(
+      (payouts: number[]) => {
+        expectMonotonicDescendingOrder(payouts);
+      });
+  });
+
+  function expectValidPayout(payoutType: PayoutType, tables: TableList) {
+    // Validate that tables have descending length
+    expectDescendingLength(tables.table);
+    // Validate that each table has descending amounts.
+    tables.table.forEach((payouts: number[]) => {
+      expectSumToOne(payouts);
+    });
+  }
+
+  function expectDescendingLength(tables: number[][]): void {
+    let lastLength = tables[0].length;
+    for (let i = 1; i < tables.length; ++i) {
+      expect(tables[i].length).toBeLessThan(lastLength);
+      lastLength = tables[i].length;
     }
-  }));
+  }
+
+  function expectStrictDescendingOrder(array: number[]): void {
+    let last = array[0];
+    for (let i=1; i < array.length; ++i) {
+      expect(array[i]).toBeLessThan(last);
+      last = array[i];
+    }
+  }
+
+  function expectMonotonicDescendingOrder(array: number[]): void {
+    let last = array[0];
+    for (let i=1; i < array.length; ++i) {
+      expect(array[i]).toBeLessThanOrEqual(last);
+      last = array[i];
+    }
+  }
 
   function expectSumToOne(array: number[]): void {
     let sum = 0;
@@ -34,32 +80,6 @@ describe('AppComponent', () => {
       sum += array[i];
     }
     expect(sum).toBe(1.0);
-  }
-
-  it('should have payout tables in descending order', async(() => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const payouts = fixture.componentInstance.PAYOUTS;
-    let lastLength = payouts[0].length;
-    for (let i = 1; i < payouts.length; ++i) {
-      expect(payouts[i].length).toBeLessThan(lastLength);
-      lastLength = payouts[i].length;
-    }
-  }));
-
-  it('should have places pay in descending order', async(() => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const payouts = fixture.componentInstance.PAYOUTS;
-    for (let i = 0; i < payouts.length; ++i) {
-      expectDescendingOrder(payouts[i]);
-    }
-  }));
-
-  function expectDescendingOrder(array: number[]): void {
-    let last = array[0];
-    for (let i=1; i < array.length; ++i) {
-      expect(array[i]).toBeLessThan(last);
-      last = array[i];
-    }
   }
 
   it('should get ordinals right', async(() => {
@@ -127,15 +147,15 @@ describe('AppComponent', () => {
 
   function expectPayout(instance: AppComponent, entryFees: number, minimum: number,
                         output: number[]): void {
-   instance.entryFees = entryFees;
-   instance.minimum = minimum;
-   instance.ngDoCheck();
-   let actual = [];
-   for (let i = 0; i < instance.actualPayouts.length; ++i) {
-     actual.push(instance.actualPayouts[i].amount);
-   }
-   console.log(`total: ${entryFees}, min: ${minimum}, pay: ${actual}`);
-   expect(actual).toEqual(output);
+    instance.entryFees = entryFees;
+    instance.minimum = minimum;
+    instance.ngDoCheck();
+    let actual = [];
+    for (let i = 0; i < instance.actualPayouts.length; ++i) {
+      actual.push(instance.actualPayouts[i].amount);
+    }
+    console.log(`total: ${entryFees}, min: ${minimum}, pay: ${actual}`);
+    expect(actual).toEqual(output);
   }
 
   it('should show no payouts for bad input', async(() => {

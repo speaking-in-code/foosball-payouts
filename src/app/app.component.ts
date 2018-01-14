@@ -14,6 +14,29 @@ enum Direction {
   Backward,
 }
 
+export enum PayoutType {
+  Ranked,
+  DoubleElim,
+}
+
+class TableMap {
+  readonly type: PayoutType;
+  readonly table: TableList;
+
+  constructor(type: PayoutType, table: TableList) {
+    this.type = type;
+    this.table = table;
+  }
+}
+
+export class TableList {
+  readonly table: number[][];
+
+  constructor(table: number[][]) {
+    this.table = table;
+  }
+}
+
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -39,20 +62,33 @@ export class AppComponent implements DoCheck {
   @Input()
   minimum = 20;
 
+  /** Strategy for payouts */
+  @Input()
+  payoutType: string;
+
   /**
    * Payouts to disable.
    */
   actualPayouts: Payout[] = [];
 
-  // Payout tables, in descending order.
-  PAYOUTS = [
-    [.3, .24, .19, .14, .09, .04],
-    [.4, .24, .16, .12, .08],
-    [.5, .25, .15, .1],
-    [.5, .3, .2],
-    [.7, .3],
-    [1.0]
-  ];
+  TABLES: Map<PayoutType, TableList> = new Map([
+    [PayoutType.Ranked, new TableList([
+      [.3, .24, .19, .14, .09, .04],
+      [.4, .24, .16, .12, .08],
+      [.5, .25, .15, .1],
+      [.5, .3, .2],
+      [.7, .3],
+      [1.0]
+      ]
+    )],
+    [PayoutType.DoubleElim, new TableList([
+      [.4, .25, .15, .10, .05, .05],
+      [.5, .25, .15, .1],
+      [.5, .3, .2],
+      [.7, .3],
+      [1.0]
+    ])]
+  ]);
 
   constructor() {
   }
@@ -65,6 +101,10 @@ export class AppComponent implements DoCheck {
     return Number(x) > 0;
   }
 
+  private getPayoutOptions(): number[][] {
+    return this.TABLES.get(PayoutType.Ranked).table;
+  }
+
   private calculatePayouts(): void {
     if (!this.validNumber(this.entryFees) || !this.validNumber(this.minimum)) {
       this.actualPayouts = [];
@@ -72,8 +112,8 @@ export class AppComponent implements DoCheck {
     }
     const round = this.getRoundFactor();
     let ok = false;
-    for (let i = 0; i < this.PAYOUTS.length; ++i) {
-      if (this.attemptPayout(this.PAYOUTS[i], round)) {
+    for (let i = 0; i < this.getPayoutOptions().length; ++i) {
+      if (this.attemptPayout(this.getPayoutOptions()[i], round)) {
         ok = true;
         break;
       }
