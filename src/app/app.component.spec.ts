@@ -20,13 +20,6 @@ describe('AppComponent', () => {
     expect(app).toBeTruthy();
   }));
 
-  it('should render title in a h1 tag', async(() => {
-    const fixture = TestBed.createComponent(AppComponent);
-    fixture.detectChanges();
-    const compiled = fixture.debugElement.nativeElement;
-    expect(compiled.querySelector('h1').textContent).toContain('Tournament Payouts Calculator');
-  }));
-
   it('should have all payouts sum to 1.0', async(() => {
     const fixture = TestBed.createComponent(AppComponent);
     const payouts = fixture.componentInstance.PAYOUTS;
@@ -43,7 +36,7 @@ describe('AppComponent', () => {
     expect(sum).toBe(1.0);
   }
 
-  it('payout tables in descending order', async(() => {
+  it('should have payout tables in descending order', async(() => {
     const fixture = TestBed.createComponent(AppComponent);
     const payouts = fixture.componentInstance.PAYOUTS;
     let lastLength = payouts[0].length;
@@ -53,7 +46,7 @@ describe('AppComponent', () => {
     }
   }));
 
-  it('each payout in descending order', async(() => {
+  it('should have places pay in descending order', async(() => {
     const fixture = TestBed.createComponent(AppComponent);
     const payouts = fixture.componentInstance.PAYOUTS;
     for (let i = 0; i < payouts.length; ++i) {
@@ -101,7 +94,7 @@ describe('AppComponent', () => {
     expect(instance.toOrdinal(111)).toEqual("111th");
   }));
 
-  it('fees divisible by 10', async(() => {
+  it('should round payouts for fees divisible by 10', async(() => {
     const instance = TestBed.createComponent(AppComponent).componentInstance;
     expectPayout(instance, 20, 20, [20]);
     expectPayout(instance, 40, 10, [30, 10]);
@@ -113,7 +106,7 @@ describe('AppComponent', () => {
     expectPayout(instance, 40, 20, [40]);
   }));
 
-  it('fees divisible by 5', async(() => {
+  it('should round payouts for fees divisible by 5', async(() => {
     const instance = TestBed.createComponent(AppComponent).componentInstance;
     expectPayout(instance, 5, 5, [5]);
     expectPayout(instance, 10, 5, [10]);
@@ -121,6 +114,15 @@ describe('AppComponent', () => {
     expectPayout(instance, 20, 5, [15, 5]);
     expectPayout(instance, 25, 5, [15, 10]);
     expectPayout(instance, 30, 5, [15, 10, 5]);
+    expectPayout(instance, 300, 5, [90, 70, 55, 40, 30, 15]);
+  }));
+
+  it('should not round payouts for fees not round numbers', async(() => {
+    const instance = TestBed.createComponent(AppComponent).componentInstance;
+    expectPayout(instance, 1, 5, [1]);
+    expectPayout(instance, 2, 5, [2]);
+    expectPayout(instance, 3, 5, [3]);
+    expectPayout(instance, 112, 5, [45, 27, 18, 13, 9]);
   }));
 
   function expectPayout(instance: AppComponent, entryFees: number, minimum: number,
@@ -136,7 +138,17 @@ describe('AppComponent', () => {
    expect(actual).toEqual(output);
   }
 
-  it('handles bad input', async(() => {
+  it('should show no payouts for bad input', async(() => {
     const instance = TestBed.createComponent(AppComponent).componentInstance;
+    instance.entryFees = 0;
+    instance.ngDoCheck();
+    expect(instance.actualPayouts).toEqual([]);
+
+    instance.entryFees = 10;
+    instance.minimum = NaN;
+    instance.ngDoCheck();
+    expect(instance.actualPayouts).toEqual([]);
+
+    expectPayout(instance, 10, 10, [10]);
   }));
 });

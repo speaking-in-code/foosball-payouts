@@ -46,6 +46,7 @@ export class AppComponent implements DoCheck {
 
   // Payout tables, in descending order.
   PAYOUTS = [
+    [.3, .24, .19, .14, .09, .04],
     [.4, .24, .16, .12, .08],
     [.5, .25, .15, .1],
     [.5, .3, .2],

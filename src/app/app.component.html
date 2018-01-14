@@ -22,7 +22,7 @@
   <tbody>
     <tr id="payouts" *ngFor="let payout of actualPayouts">
       <td>{{payout.place}}</td>
-      <td>%{{payout.percentage * 100}}</td>
+      <td>%{{payout.percentage * 100|number:0}}</td>
       <td>${{payout.amount}}</td>
     </tr>
   </tbody>
