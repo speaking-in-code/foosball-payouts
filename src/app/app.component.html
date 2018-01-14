@@ -1,34 +1,19 @@
-<div style="text-align:center">
-  <h1>
-    Tournament Payouts Calculator
-  </h1>
+<div class="title">
+  Tournament Payouts Calculator
 </div>
-
-<form #f="ngForm">
-  <table>
-    <tbody>
-    <tr>
-      <td>
-        <label for="entryFees">Entry Fees</label>
-      </td>
-      <td>
-        <input [(ngModel)]="entryFees" name="entryFees" type="number" min="0"/>
-      </td>
-    </tr>
-    <tr>
-      <td>
-        <label for="minimum">Minimum Payout</label>
-      </td>
-      <td>
-        <input [(ngModel)]="minimum" name="minimum" type="number" min="1"/>
-      </td>
-    </tr>
-    </tbody>
-  </table>
+<hr/>
+<div class="main">
+<form class="form" #f="ngForm">
+  <div style="float:left; margin-right:20px;">
+    <label for="entryFees">Entry Fees</label>
+    <input [(ngModel)]="entryFees" size=10 name="entryFees" type="number" min="0"/>
+  </div>
+  <div style="float:left;">
+    <label for="minimum">Minimum Payout</label>
+    <input [(ngModel)]="minimum" size=10 name="minimum" type="number" min="1"/>
+  </div>
 </form>
-
-
-<table>
+<table style="clear:left" class="TFtable">
   <thead>
     <td>Place</td>
     <td>Percentage</td>
@@ -42,4 +27,4 @@
     </tr>
   </tbody>
 </table>
-
+</div>
