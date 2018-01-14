@@ -1,17 +1,11 @@
 #!/bin/bash
 
+set -e
 ng build \
   --prod \
-  --base-href=/payouts \
+  --base-href=/ \
   --aot \
   --build-optimizer \
   --environment=prod
 
-WORK=$(mktemp -d)
-function finish {
-  rm -rf ${WORK}
-}
-trap finish EXIT
-mv dist ${WORK}/payouts
-tar -C ${WORK} -v -c -z -f payouts.tgz payouts
-echo "Output in payouts.tgz"
+firebase deploy --only hosting
