@@ -3,38 +3,66 @@ import {FormsModule} from '@angular/forms';
 import {NgModule} from '@angular/core';
 import {BrowserModule} from '@angular/platform-browser';
 
-class Payout {
+/**
+ * Representation of a payout.
+ */
+export class Payout {
+  /** 1st, 2nd, 3rd, etc... */
   place: string;
-  percentage: number;
+  /** .5, .3, etc... */
+  fraction: number;
+  /** 100, 50, 30, ... */
   amount: number;
 }
 
-enum Direction {
-  Forward,
-  Backward,
-}
-
+/**
+ * Type of table to use for payouts.
+ *
+ * Ranked: no ties.
+ * Double elim: ties starting at 5/6.
+ */
 export enum PayoutType {
   Ranked,
   DoubleElim,
 }
 
-class TableMap {
-  readonly type: PayoutType;
-  readonly table: TableList;
+/**
+ * A single entry in a payout table.
+ */
+export class Table {
+  readonly fractions: number[];
+  private readonly numTies: number[];
 
-  constructor(type: PayoutType, table: TableList) {
-    this.type = type;
-    this.table = table;
+  /** Creates the payout table */
+  constructor(fractions: number[]) {
+    this.fractions = fractions;
+    // Initializing the ties table.
+    this.numTies = new Array(fractions.length);
+    this.numTies.fill(-1, 0, fractions.length);
+    let start = 0;
+    let end = start;
+    while (start < fractions.length) {
+      if (end === fractions.length || fractions[start] !== fractions[end]) {
+        this.numTies.fill(end - start, start, end);
+        start = end;
+      } else {
+        ++end;
+      }
+    }
+  }
+
+  /**
+   * Gets the number of teams tied for a given place. At least 1, possibly more.
+   */
+  getNumTies(place: number): number {
+    return this.numTies[place];
   }
 }
 
-export class TableList {
-  readonly table: number[][];
-
-  constructor(table: number[][]) {
-    this.table = table;
-  }
+/** Used for iteration order control during payout algorithm. */
+enum Direction {
+  Forward,
+  Backward,
 }
 
 @Component({
@@ -64,30 +92,32 @@ export class AppComponent implements DoCheck {
 
   /** Strategy for payouts */
   @Input()
-  payoutType: string;
+  payoutType: PayoutType = PayoutType.Ranked;
 
   /**
    * Payouts to disable.
    */
   actualPayouts: Payout[] = [];
 
-  TABLES: Map<PayoutType, TableList> = new Map([
-    [PayoutType.Ranked, new TableList([
-      [.3, .24, .19, .14, .09, .04],
-      [.4, .24, .16, .12, .08],
-      [.5, .25, .15, .1],
-      [.5, .3, .2],
-      [.7, .3],
-      [1.0]
-      ]
-    )],
-    [PayoutType.DoubleElim, new TableList([
-      [.4, .25, .15, .10, .05, .05],
-      [.5, .25, .15, .1],
-      [.5, .3, .2],
-      [.7, .3],
-      [1.0]
-    ])]
+  /**
+   * Payout tables to use.
+   */
+  TABLES: Map<PayoutType, Table[]> = new Map([
+    [PayoutType.Ranked, [
+      new Table([.3, .24, .19, .14, .09, .04]),
+      new Table([.4, .24, .16, .12, .08]),
+      new Table([.5, .25, .15, .1]),
+      new Table([.5, .3, .2]),
+      new Table([.7, .3]),
+      new Table([1.0])
+    ]],
+    [PayoutType.DoubleElim, [
+      new Table([.4, .25, .15, .10, .05, .05]),
+      new Table([.5, .25, .15, .1]),
+      new Table([.5, .3, .2]),
+      new Table([.7, .3]),
+      new Table([1.0])
+    ]]
   ]);
 
   constructor() {
@@ -101,10 +131,13 @@ export class AppComponent implements DoCheck {
     return Number(x) > 0;
   }
 
-  private getPayoutOptions(): number[][] {
-    return this.TABLES.get(PayoutType.Ranked).table;
+  private getPayoutOptions(): Array<Table> {
+    return this.TABLES.get(this.payoutType);
   }
 
+  /**
+   * Core function that recalculates payouts when values change.
+   */
   private calculatePayouts(): void {
     if (!this.validNumber(this.entryFees) || !this.validNumber(this.minimum)) {
       this.actualPayouts = [];
@@ -112,8 +145,9 @@ export class AppComponent implements DoCheck {
     }
     const round = this.getRoundFactor();
     let ok = false;
-    for (let i = 0; i < this.getPayoutOptions().length; ++i) {
-      if (this.attemptPayout(this.getPayoutOptions()[i], round)) {
+    const tableList = this.getPayoutOptions();
+    for (const table of tableList) {
+      if (this.attemptPayout(table, round)) {
         ok = true;
         break;
       }
@@ -122,7 +156,7 @@ export class AppComponent implements DoCheck {
     if (!ok) {
       this.actualPayouts = [{
         place: this.toOrdinal(1),
-        percentage: 1.0,
+        fraction: 1.0,
         amount: this.entryFees
       }];
     }
@@ -177,112 +211,154 @@ export class AppComponent implements DoCheck {
     return 1;
   }
 
-  private sum(payout: number[]): number {
+  private sum(payouts: number[]): number {
     let total = 0;
-    for (let i=0; i < payout.length; ++i) {
-      total += payout[i];
+    for (const payout of payouts) {
+      total += payout;
     }
     return total;
   }
 
-  private makeDecreasing(payouts: number[], round: number): void {
-    for (let i = 1; i < payouts.length; ++i) {
-      if (payouts[i] === payouts[i-1]) {
-        payouts[i] -= round;
+  private makeDecreasing(table: Table, payouts: number[], round: number): void {
+    for (let i = 1; i < payouts.length;) {
+      const prev = i - 1;
+      const numTies = table.getNumTies(i);
+      if (payouts[i] === payouts[prev]) {
+        for (let j = 0; j < numTies; ++j) {
+          payouts[i + j] -= round;
+        }
       }
+      i += numTies;
     }
   }
 
-  private increaseFromBottom(payouts: number[], excess: number, round: number): void {
-    this.distribute(payouts, excess, round, Direction.Backward);
+  private increaseFromBottom(table: Table, payouts: number[], excess: number, round: number): void {
+    this.distribute(table, payouts, excess, round, Direction.Backward);
   }
 
-  private increaseFromTop(payouts: number[], excess: number, round: number): void {
-    this.distribute(payouts, excess, round, Direction.Forward);
+  private increaseFromTop(table: Table, payouts: number[], excess: number, round: number): void {
+    this.distribute(table, payouts, excess, round, Direction.Forward);
   }
 
-  private decreaseFromBottom(payouts: number[], excess: number, round: number): void {
-    this.distribute(payouts, excess, -round, Direction.Backward);
+  private decreaseFromBottom(table: Table, payouts: number[], excess: number, round: number): void {
+    this.distribute(table, payouts, excess, -round, Direction.Backward);
   }
 
-  private decreaseFromTop(payouts: number[], excess: number, round: number): void {
-    this.distribute(payouts, excess, -round, Direction.Forward);
+  private decreaseFromTop(table: Table, payouts: number[], excess: number, round: number): void {
+    this.distribute(table, payouts, excess, -round, Direction.Forward);
   }
 
   /**
    * Distributes excess over payouts.
    *
+   * @param {Table} payout metadata table
    * @param {number[]} payouts to modify
    * @param {number} excess amount to distribute
    * @param {number} step size of each distribution
    * @param {Direction} direction whether to start at front or back.
    */
-  private distribute(payouts: number[], excess: number, step: number, direction: Direction) {
+  private distribute(table: Table, payouts: number[], excess: number, step: number,
+                     direction: Direction) {
     if (excess % step !== 0) {
       throw new Error(`excess ${excess} must be a multiple of ${step}`);
     }
+    // Next index
+    let next;
+    // Handles incrementing the index.
+    let increment;
     if (direction === Direction.Forward) {
-      let next = 0;
-      while (excess !== 0) {
-        payouts[next] += step;
-        excess -= step;
+      // Forward iterator
+      next = 0;
+      increment = () => {
         next = (next + 1) % payouts.length;
-      }
+      };
     } else {
-      let next = payouts.length - 1;
-      while (excess !== 0) {
-        payouts[next] += step;
-        excess -= step;
+      // Backwards iterator.
+      next = payouts.length - 1;
+      increment = () => {
         --next;
         if (next < 0) {
           next = payouts.length - 1;
         }
+      };
+    }
+    while (excess !== 0) {
+      const numTies = table.getNumTies(next);
+      if (excess < numTies * step) {
+        // Can't distribute to all of the equivalent places, give up.
+        break;
+      }
+      for (let j = 0; j < numTies; ++j) {
+        payouts[next] += step;
+        excess -= step;
+        increment();
       }
     }
   }
 
-  private attemptPayout(table: number[], round: number): boolean {
+  private attemptPayout(table: Table, round: number): boolean {
     const planned: number[] = [];
     // Start by rounding payouts.
-    for (let i = 0; i < table.length; ++i) {
-      const amount = this.roundNumber(this.entryFees * table[i], round);
+    for (const fraction of table.fractions) {
+      const amount = this.roundNumber(this.entryFees * fraction, round);
       planned.push(amount);
     }
 
     // Then make them steadily decreasing.
-    this.makeDecreasing(planned, round);
+    this.makeDecreasing(table, planned, round);
 
     // Then distribute any leftovers.
     let excess: number = this.entryFees - this.sum(planned);
     if (excess > 0) {
-      this.increaseFromBottom(planned, excess, round);
+      // Rounded down too much. Increase payouts at the low-end.
+      this.increaseFromBottom(table, planned, excess, round);
       // Make them steadily decreasing again.
-      this.makeDecreasing(planned, round);
+      this.makeDecreasing(table, planned, round);
       // Distribute any leftovers from the top.
       excess = this.entryFees - this.sum(planned);
-      this.increaseFromTop(planned, excess, round);
+      this.increaseFromTop(table, planned, excess, round);
     } else if (excess < 0) {
-      this.decreaseFromTop(planned, excess, round);
+      // Rounded up a bit too much, take payouts from the high-end.
+      this.decreaseFromTop(table, planned, excess, round);
       // Make them steadily decreasing again.
-      this.makeDecreasing(planned, round);
+      this.makeDecreasing(table, planned, round);
       // Distribute any leftovers from the top.
       excess = this.entryFees - this.sum(planned);
-      this.increaseFromTop(planned, excess, round);
+      this.increaseFromTop(table, planned, excess, round);
+    }
+
+    // Make sure fair distribution succeeded.
+    excess = this.entryFees - this.sum(planned);
+    if (excess !== 0) {
+      return false;
     }
 
     // Make sure that all payouts are greater than minimum.
-    for (let i = planned.length - 1; i >= 0; --i) {
-      if (planned[i] < this.minimum) {
+    for (const amount of planned) {
+      if (amount < this.minimum) {
         return false;
       }
     }
 
     // Got it. Create the new payouts to be displayed..
     this.actualPayouts = [];
+    let startTie = 0;
+    let endTie = 0;
+    let ordinal: string;
     for (let i = 0; i < planned.length; ++i) {
+      if (i === endTie) {
+        startTie = i;
+        const numTies = table.getNumTies(i);
+        endTie = startTie + numTies;
+        if (numTies === 1) {
+          ordinal = this.toOrdinal(startTie + 1);
+        } else {
+          ordinal = this.toOrdinal(startTie + 1) + '/' + this.toOrdinal(endTie);
+        }
+      }
       this.actualPayouts.push({
-        place: this.toOrdinal(i + 1),
-        percentage: table[i],
+        place: ordinal,
+        fraction: table.fractions[i],
         amount: planned[i]
       });
     }
@@ -291,7 +367,6 @@ export class AppComponent implements DoCheck {
 
   private roundNumber(amount: number, round: number): number {
     const multiplier = Math.round(amount / round);
-    const out = multiplier * round;
-    return out;
+    return multiplier * round;
   }
 }
