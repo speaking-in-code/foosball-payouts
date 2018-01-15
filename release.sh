@@ -1,6 +1,16 @@
 #!/bin/bash
 
 set -e
+VERSION=${1}
+PROJECT=
+if [[ "${VERSION}" = "prod" ]]; then
+  PROJECT=foosball-payouts
+elif [[ "${VERSION}" = "old" ]]; then
+  PROJECT=payouts
+else
+  PROJECT=payouts-beta
+fi
+
 ng build \
   --prod \
   --base-href=/ \
@@ -8,4 +18,6 @@ ng build \
   --build-optimizer \
   --environment=prod
 
-firebase deploy --only hosting
+firebase deploy \
+  --only hosting \
+  --project ${PROJECT}
