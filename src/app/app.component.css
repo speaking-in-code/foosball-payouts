@@ -1,11 +1,9 @@
 .title {
-  font-family: "Yanone Kaffeesatz", "Helvetica Neue", "HelveticaNeue", Arial;
   font-size: 20pt;
   color: #222222;
 }
 
 .main {
-  font-family: "Yanone Kaffeesatz", "Helvetica Neue", "HelveticaNeue", Arial;
   font-size: 16pt;
   color: #222222;
 }
@@ -23,6 +21,17 @@
   box-sizing: border-box;
   border: none;
   border-bottom: 2px solid;
+  display: block;
+}
+
+.form select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  font-size: 16pt;
+  padding: 12px 20px;
+  margin: 8px 0;
+  box-sizing: border-box;
+  border: none;
   display: block;
 }
 
@@ -48,4 +57,3 @@
 .TFtable tr:nth-child(even) {
   background: #dae5f4;
 }
-

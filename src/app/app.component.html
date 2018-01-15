@@ -8,9 +8,16 @@
     <label for="entryFees">Entry Fees</label>
     <input [(ngModel)]="entryFees" size=10 name="entryFees" type="number" min="0"/>
   </div>
-  <div style="float:left;">
+  <div style="float:left; margin-right:20px;">
     <label for="minimum">Minimum Payout</label>
     <input [(ngModel)]="minimum" size=10 name="minimum" type="number" min="1"/>
+  </div>
+  <div style="float:left">
+    <label for="payoutType">Payout Type</label>
+    <select [(ngModel)]="payoutType" name="payoutType">
+      <option value="1">No Ties</option>
+      <option value="2">Double Elimination Payouts</option>
+    </select>
   </div>
 </form>
 <table style="clear:left" class="TFtable">

@@ -22,8 +22,8 @@ export class Payout {
  * Double elim: ties starting at 5/6.
  */
 export enum PayoutType {
-  Ranked,
-  DoubleElim,
+  Ranked = 1,
+  DoubleElim = 2,
 }
 
 /**
@@ -132,20 +132,21 @@ export class AppComponent implements DoCheck {
   }
 
   private getPayoutOptions(): Array<Table> {
-    return this.TABLES.get(this.payoutType);
+    return this.TABLES.get(Number(this.payoutType));
   }
 
   /**
    * Core function that recalculates payouts when values change.
    */
   private calculatePayouts(): void {
-    if (!this.validNumber(this.entryFees) || !this.validNumber(this.minimum)) {
+    const tableList = this.getPayoutOptions();
+    if (!this.validNumber(this.entryFees) || !this.validNumber(this.minimum) ||
+        !tableList) {
       this.actualPayouts = [];
       return;
     }
     const round = this.getRoundFactor();
     let ok = false;
-    const tableList = this.getPayoutOptions();
     for (const table of tableList) {
       if (this.attemptPayout(table, round)) {
         ok = true;
