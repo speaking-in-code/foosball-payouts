@@ -4,21 +4,15 @@
 <hr/>
 <div class="main">
 <form class="form" #f="ngForm">
-  <div>
-    <label for="entryFees">Entry Fees</label>
-    <input [(ngModel)]="entryFees" size=10 name="entryFees" type="number" min="0"/>
-  </div>
-  <div>
-    <label for="minimum">Minimum Payout</label>
-    <input [(ngModel)]="minimum" size=10 name="minimum" type="number" min="1"/>
-  </div>
-  <div>
-    <label for="payoutType">Payout Type</label>
-    <select [(ngModel)]="payoutType" name="payoutType">
-      <option value="1">No Ties</option>
-      <option value="2">Double Elimination Payouts</option>
-    </select>
-  </div>
+  <label for="entryFees">Entry Fees</label>
+  <input [(ngModel)]="entryFees" size=10 name="entryFees" type="number" min="0"/>
+  <label for="minimum">Minimum Payout</label>
+  <input [(ngModel)]="minimum" size=10 name="minimum" type="number" min="1"/>
+  <label for="payoutType">Payout Type</label>
+  <select [(ngModel)]="payoutType" name="payoutType">
+    <option value="1">No Ties</option>
+    <option value="2">Ties: Double Elimination</option>
+  </select>
 </form>
 <table class="TFtable">
   <thead>
