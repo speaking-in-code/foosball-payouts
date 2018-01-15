@@ -5,8 +5,6 @@ VERSION=${1}
 PROJECT=
 if [[ "${VERSION}" = "prod" ]]; then
   PROJECT=foosball-payouts
-elif [[ "${VERSION}" = "old" ]]; then
-  PROJECT=payouts
 else
   PROJECT=payouts-beta
 fi
