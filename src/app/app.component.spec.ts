@@ -167,6 +167,13 @@ describe('AppComponent', () => {
     expectPayout(instance, 64, 5, [26, 15, 10, 8, 5]);
   }));
 
+  it ('should pay properly for 1000', async(() => {
+    const instance = TestBed.createComponent(AppComponent).componentInstance;
+    instance.payoutType = PayoutType.Ranked;
+    const payouts = expectPayout(instance, 1000, 20,
+      [300, 200, 150, 110, 80, 70, 50, 40]);
+  }));
+
   it ('should pay for 5th-6th tie', async(() => {
     const instance = TestBed.createComponent(AppComponent).componentInstance;
     instance.payoutType = PayoutType.DoubleElim;
