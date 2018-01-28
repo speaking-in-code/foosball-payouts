@@ -93,7 +93,7 @@ describe('AppComponent', () => {
     for (let i = 0; i < array.length; ++i) {
       sum += array[i];
     }
-    expect(sum).toBe(1.0);
+    expect(sum).toBeCloseTo(1.0);
   }
 
   it('should get ordinals right', async(() => {
@@ -156,7 +156,7 @@ describe('AppComponent', () => {
     expectPayout(instance, 20, 5, [15, 5]);
     expectPayout(instance, 25, 5, [15, 10]);
     expectPayout(instance, 30, 5, [15, 10, 5]);
-    expectPayout(instance, 300, 5, [90, 70, 55, 40, 30, 15]);
+    expectPayout(instance, 200, 5, [60, 40, 30, 25, 20, 15, 10]);
   }));
 
   it('should not round payouts for fees not round numbers', async(() => {
@@ -164,7 +164,7 @@ describe('AppComponent', () => {
     expectPayout(instance, 1, 5, [1]);
     expectPayout(instance, 2, 5, [2]);
     expectPayout(instance, 3, 5, [3]);
-    expectPayout(instance, 112, 5, [45, 27, 18, 13, 9]);
+    expectPayout(instance, 64, 5, [26, 15, 10, 8, 5]);
   }));
 
   it ('should pay for 5th-6th tie', async(() => {

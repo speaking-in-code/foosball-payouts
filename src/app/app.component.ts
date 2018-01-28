@@ -104,6 +104,8 @@ export class AppComponent implements DoCheck {
    */
   TABLES: Map<PayoutType, Table[]> = new Map([
     [PayoutType.Ranked, [
+      new Table([.3, .2, .15, .11, .08, .07, .05, .04]),
+      new Table([.3, .2, .15, .12, .09, .08, .06]),
       new Table([.3, .24, .19, .14, .09, .04]),
       new Table([.4, .24, .16, .12, .08]),
       new Table([.5, .25, .15, .1]),
@@ -112,6 +114,8 @@ export class AppComponent implements DoCheck {
       new Table([1.0])
     ]],
     [PayoutType.DoubleElim, [
+      new Table([.3, .2, .12, .08, .06, .06, .05, .05, .02, .02, .02, .02]),
+      new Table([.4, .2, .12, .08, .06, .06, .04, .04]),
       new Table([.4, .25, .15, .10, .05, .05]),
       new Table([.5, .25, .15, .1]),
       new Table([.5, .3, .2]),
@@ -224,9 +228,9 @@ export class AppComponent implements DoCheck {
     for (let i = 1; i < payouts.length;) {
       const prev = i - 1;
       const numTies = table.getNumTies(i);
-      if (payouts[i] === payouts[prev]) {
+      if (payouts[i] >= payouts[prev]) {
         for (let j = 0; j < numTies; ++j) {
-          payouts[i + j] -= round;
+          payouts[i + j] = payouts[prev] - round;
         }
       }
       i += numTies;
