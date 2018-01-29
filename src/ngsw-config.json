@@ -6,7 +6,9 @@
     "resources": {
       "files": [
         "/favicon.ico",
-        "/index.html"
+        "/index.html",
+        "/robots.txt",
+        "/sitemap.xml"
       ],
       "versionedFiles": [
         "/*.bundle.css",
