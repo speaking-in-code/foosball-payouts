@@ -108,7 +108,8 @@ export class AppComponent implements DoCheck {
       new Table([.3, .2, .15, .12, .09, .08, .06]),
       new Table([.3, .24, .19, .14, .09, .04]),
       new Table([.4, .24, .16, .12, .08]),
-      new Table([.5, .25, .15, .1]),
+      // new Table([.5, .25, .15, .1]),
+      new Table([.45, .3, .15, .1]),
       new Table([.5, .3, .2]),
       new Table([.7, .3]),
       new Table([1.0])
@@ -117,7 +118,8 @@ export class AppComponent implements DoCheck {
       new Table([.3, .2, .12, .08, .06, .06, .05, .05, .02, .02, .02, .02]),
       new Table([.4, .2, .12, .08, .06, .06, .04, .04]),
       new Table([.4, .25, .15, .10, .05, .05]),
-      new Table([.5, .25, .15, .1]),
+      // new Table([.5, .25, .15, .1]),
+      new Table([.45, .3, .15, .1]),
       new Table([.5, .3, .2]),
       new Table([.7, .3]),
       new Table([1.0])

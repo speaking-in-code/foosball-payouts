@@ -140,8 +140,8 @@ describe('AppComponent', () => {
   it('should round payouts for fees divisible by 10', async(() => {
     const instance = TestBed.createComponent(AppComponent).componentInstance;
     expectPayout(instance, 20, 20, [20]);
-    expectPayout(instance, 100, 20,[50, 30, 20]);
-    expectPayout(instance, 200, 20,[100, 50, 30, 20]);
+    expectPayout(instance, 100, 20, [50, 30, 20]);
+    expectPayout(instance, 200, 20, [90, 60, 30, 20]);
 
     expectPayout(instance, 40, 5, [25, 10, 5]);
     expectPayout(instance, 40, 10, [30, 10]);
