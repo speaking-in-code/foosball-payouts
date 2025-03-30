@@ -25,10 +25,12 @@
     "chromedriver": "^134.0.5",
     "core-js": "^2.6.11",
     "rxjs": "^6.6.7",
+    "tslib": "^1.9.0",
     "webdriver-manager": "^12.1.7",
     "zone.js": "^0.8.29"
   },
   "devDependencies": {
+    "@angular-devkit/build-angular": "~0.13.0",
     "@angular-devkit/schematics": "0.0.48",
     "@angular/cli": "7.3.10",
     "@angular/compiler-cli": "^7.2.16",
