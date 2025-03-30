@@ -8,7 +8,8 @@
         "/favicon.ico",
         "/index.html",
         "/robots.txt",
-        "/sitemap.xml"
+        "/sitemap.xml",
+          "/manifest.webmanifest"
       ],
       "versionedFiles": [
         "/*.bundle.css",
