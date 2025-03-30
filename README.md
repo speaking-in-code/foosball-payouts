@@ -1,6 +1,6 @@
 # Payouts
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 1.6.4.
+Project was created with Angular 7 and then upgraded to Angular 19.
 
 ## Development server
 

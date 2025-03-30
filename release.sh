@@ -10,11 +10,7 @@ else
 fi
 
 ng build \
-  --prod \
-  --base-href=/ \
-  --aot \
-  --build-optimizer \
-  --environment=prod
+  --base-href=/
 
 firebase deploy \
   --only hosting \
