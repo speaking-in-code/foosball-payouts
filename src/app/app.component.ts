@@ -71,17 +71,6 @@ enum Direction {
     styleUrls: ['./app.component.css'],
     standalone: false
 })
-@NgModule({
-  imports: [
-    BrowserModule,
-    FormsModule
-  ],
-  declarations: [
-    AppComponent
-  ],
-  providers: [],
-  bootstrap: [AppComponent]
-})
 export class AppComponent implements DoCheck {
   /** Entry fee from form. */
   @Input()

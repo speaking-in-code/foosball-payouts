@@ -35,7 +35,7 @@
   display: block;
 }
 
-// From https://www.textfixer.com/tutorials/css-table-alternating-rows.php
+/* From https://www.textfixer.com/tutorials/css-table-alternating-rows.php */
 .TFtable {
   width:100%;
   border-collapse:collapse;
