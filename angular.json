@@ -152,6 +152,19 @@
               "devServerTarget": "payouts:serve:production"
             }
           }
+        },
+        "e2e-headless": {
+          "builder": "@cypress/schematic:cypress",
+          "options": {
+            "devServerTarget": "payouts:serve",
+            "watch": false,
+            "headless": true
+          },
+          "configurations": {
+            "production": {
+              "devServerTarget": "payouts:serve:production"
+            }
+          }
         }
       }
     }

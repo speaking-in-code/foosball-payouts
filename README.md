@@ -20,15 +20,17 @@ Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.
 
 ## Running end-to-end tests
 
-Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
+Run `ng e2e` to execute the end-to-end tests via Cypress.
+
+Run `ng run payouts:e2e-headless` to execute the tests without opening a browser window.
 
 ## Releasing the binary
 
-`./release.sh` pushes to https://payouts-beta.firebaseapp.com/.
+`./release.sh` pushes to https://bayfoos.com/payouts-beta
 
 Do a quick test there to make sure nothing is obviously broken. Then push to prod:
 
-`./release.sh prod` pushes to https://foosball-payouts.firebaseapp.com/.
+`./release.sh prod` pushes to https://bayfoos.com/payouts
 
 ## Further help
 
