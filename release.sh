@@ -4,14 +4,14 @@ set -e
 VERSION=${1}
 PROJECT=
 if [[ "${VERSION}" = "prod" ]]; then
-  PROJECT=foosball-payouts
+  BASE=/payouts/
 else
-  PROJECT=payouts-beta
+  BASE=/payouts-beta/
 fi
 
 ng build \
-  --base-href=/
+  --base-href="${BASE}"
 
-firebase deploy \
-  --only hosting \
-  --project ${PROJECT}
+rsync -avz \
+    dist/browser/ \
+    "dh_nptkcr@pdx1-shared-a1-11.dreamhost.com:/home/dh_nptkcr/bayfoos.com/${BASE}"
